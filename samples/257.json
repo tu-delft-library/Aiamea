@@ -1,10 +1,16 @@
 {
   "title": "Soil Investigations as a Cornerstone for Geotechnical Design of Liquefaction Mitigation Measures Below Levees",
   "authors": [
-    "Mario Bacic",
-    "Katarina Andacic",
-    "Kenneth Gavin",
-    "Kosta Urumovic"
+    "MARIO BACIC",
+    "KATARINA ANDACIC",
+    "KENNETH GAVIN",
+    "KOSTA URUMOVIC"
+  ],
+  "affiliations": [
+    "University of Zagreb, Faculty of Civil Engineering, Croatia",
+    "Center of Faculty of Civil Engineering ltd, Croatia",
+    "TU Delft, the Netherlands",
+    "Croatian Geological Survey, Croatia"
   ],
   "year": 2024,
   "abstract": "Levees are particularly susceptible to damage during seismic events, and failure mechanisms can involve large deformations due to soil liquefaction within and below the levee. To assess the liquefaction potential below the levees, and for the purpose of planning liquefaction mitigation measures, in-situ and/or laboratory investigations must be carried out. This is a challenge, especially due to the great length of the levees, and the limited financial and time resources available for carrying out the investigations. This paper provides an insight into two examples of investigation work carried out to determine the liquefaction potential and gives an overview of the design measures to remediate the underlying soil. These are the PuScine levee in Medimurje County, which was reconstructed due to insufficient height in terms of flooding, and the Hrastelnica levee in Sisak-Moslavina County, which was damaged in the 2020 Petrinja earthquake. While numerous dynamic penetration tests were carried out on the PuScine levee to assess the liquefaction potential, Hrastelnica levee assessments relied on the static (cone) penetration tests. The paper further discusses step forward in mapping the spatial variability of liquefaction potential under the levees, through the efforts of ongoing LeveeLiq project.",
@@ -16,14 +22,14 @@
     "LeveeLiq project"
   ],
   "doi": "https://doi.org/10.5592/CO/EUROENGEO,2024.257",
-  "publication_type": "conference paper",
+  "publication_type": "conference",
   "publisher": "IAEG",
-  "conference_name": "4th European Regional Conference of IAEG",
+  "conference_name": "EUROENGEO 2024",
   "conference_acronym": "EUROENGEO",
-  "conference_place": "Croatia",
+  "conference_place": "Europe",
   "conference_country": "Croatia",
   "conference_dates": {
-    "start_date": "2024-05-01",
-    "end_date": "2024-05-03"
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-02"
   }
 }

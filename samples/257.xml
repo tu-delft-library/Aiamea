@@ -1,1 +1,90 @@
-<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:ar="http://purl.org/coar/access_right" xmlns:cerif="https://www.openaire.eu/cerif-profile/1.2/" xmlns:pubt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types" xmlns:pure="https://pure.elsevier.com/schema/extensions/oai_cerif_openaire" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0//OAI-PMH.xsd https://www.openaire.eu/cerif-profile/1.2/ https://www.openaire.eu/schema/cris/current/openaire-cerif-profile.xsd"><ListRecords><record><metadata><cerif:Publication id="5212b1d6-8e20-4ae8-aa12-7e7223b69fe4"><pubt:Type pure:peerReviewed="true" pure:publicationCategory="/dk/atira/pure/researchoutput/category/scientific">conference paper</pubt:Type><cerif:Language>en</cerif:Language><cerif:Title xml:lang="en">Soil Investigations as a Cornerstone for Geotechnical Design of Liquefaction Mitigation Measures Below Levees</cerif:Title><cerif:Abstract xml:lang="en">Levees are particularly susceptible to damage during seismic events, and failure mechanisms can involve large deformations due to soil liquefaction within and below the levee. To assess the liquefaction potential below the levees, and for the purpose of planning liquefaction mitigation measures, in-situ and/or laboratory investigations must be carried out. This is a challenge, especially due to the great length of the levees, and the limited financial and time resources available for carrying out the investigations. This paper provides an insight into two examples of investigation work carried out to determine the liquefaction potential and gives an overview of the design measures to remediate the underlying soil. These are the PuScine levee in Medimurje County, which was reconstructed due to insufficient height in terms of flooding, and the Hrastelnica levee in Sisak-Moslavina County, which was damaged in the 2020 Petrinja earthquake. While numerous dynamic penetration tests were carried out on the PuScine levee to assess the liquefaction potential, Hrastelnica levee assessments relied on the static (cone) penetration tests. The paper further discusses step forward in mapping the spatial variability of liquefaction potential under the levees, through the efforts of ongoing LeveeLiq project.</cerif:Abstract><cerif:Keyword xml:lang="en">liquefaction</cerif:Keyword><cerif:Keyword xml:lang="en">levee</cerif:Keyword><cerif:Keyword xml:lang="en">soil investigation works</cerif:Keyword><cerif:Keyword xml:lang="en">remediation design</cerif:Keyword><cerif:Keyword xml:lang="en">LeveeLiq project</cerif:Keyword><cerif:DOI>10.5592/CO/EUROENGEO,2024.257</cerif:DOI><cerif:Authors><cerif:Author><cerif:Person id="c1323828-29c8-400e-9249-8cc1262c4406"><cerif:PersonName><cerif:FirstNames>Mario</cerif:FirstNames><cerif:FamilyNames>Bacic</cerif:FamilyNames></cerif:PersonName></cerif:Person><cerif:Affiliation /></cerif:Author><cerif:Author><cerif:Person id="57de66f2-3f9f-4428-9e9e-dc363dd4d7f2"><cerif:PersonName><cerif:FirstNames>Katarina</cerif:FirstNames><cerif:FamilyNames>Andacic</cerif:FamilyNames></cerif:PersonName></cerif:Person><cerif:Affiliation /></cerif:Author><cerif:Author><cerif:Person id="206eed4d-915f-4760-bb0b-7896f8297c46"><cerif:PersonName><cerif:FirstNames>Kenneth</cerif:FirstNames><cerif:FamilyNames>Gavin</cerif:FamilyNames></cerif:PersonName></cerif:Person><cerif:Affiliation /></cerif:Author><cerif:Author><cerif:Person id="4d9f0f6b-ee0b-4211-bb9a-351d376e7f05"><cerif:PersonName><cerif:FirstNames>Kosta</cerif:FirstNames><cerif:FamilyNames>Urumovic</cerif:FamilyNames></cerif:PersonName></cerif:Person><cerif:Affiliation /></cerif:Author></cerif:Authors><cerif:PartOf><cerif:Publication><pubt:Type>http://purl.org/coar/resource_type/c_0640</pubt:Type><cerif:Title xml:lang="en">4th European Regional Conference of IAEG</cerif:Title></cerif:Publication></cerif:PartOf><cerif:PresentedAt><Event><Acronym>EUROENGEO</Acronym><Name>4th European Regional Conference of IAEG</Name><Place>Croatia</Place><Country>Croatia</Country><StartDate>2024-05-01</StartDate><EndDate>2024-05-03</EndDate></Event></cerif:PresentedAt><cerif:PublicationDate>2024</cerif:PublicationDate><cerif:Status scheme="/dk/atira/pure/researchoutput/status">published</cerif:Status><ar:Access>http://purl.org/coar/access_right/c_abf2</ar:Access></cerif:Publication></metadata></record></ListRecords></OAI-PMH>
+<?xml version="1.0" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:cerif="https://www.openaire.eu/cerif-profile/1.2/" xmlns:pubt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0//OAI-PMH.xsd https://www.openaire.eu/cerif-profile/1.2/ https://www.openaire.eu/schema/cris/current/openaire-cerif-profile.xsd">
+    <ListRecords>
+        <record>
+            <metadata>
+                <cerif:Publication id="Publications/de3cbd44-3587-4a51-b30d-1cd4712ad487">
+                    <pubt:Type>conference</pubt:Type>
+                    <cerif:Language>en</cerif:Language>
+                    <cerif:Title xml:lang="en">Soil Investigations as a Cornerstone for Geotechnical Design of Liquefaction Mitigation Measures Below Levees</cerif:Title>
+                    <cerif:DOI>https://doi.org/10.5592/CO/EUROENGEO,2024.257</cerif:DOI>
+                    <cerif:Authors>
+                        <cerif:Author>
+                            <cerif:DisplayName>MARIO BACIC</cerif:DisplayName>
+                            <cerif:Person id="70e486d4-e4e8-462a-8cc9-8e56f3ee3676">
+                                <cerif:PersonName>
+                                    <cerif:FamilyNames>BACIC</cerif:FamilyNames>
+                                    <cerif:FirstNames>MARIO</cerif:FirstNames>
+                                </cerif:PersonName>
+                            </cerif:Person>
+                            <cerif:Affiliation>
+                                <cerif:OrgUnit>
+                                    <cerif:Name xml:lang="en">University of Zagreb, Faculty of Civil Engineering, Croatia</cerif:Name>
+                                </cerif:OrgUnit>
+                            </cerif:Affiliation>
+                        </cerif:Author>
+                        <cerif:Author>
+                            <cerif:DisplayName>KATARINA ANDACIC</cerif:DisplayName>
+                            <cerif:Person id="99384c4d-61fe-4911-92e2-efb0dd9160ae">
+                                <cerif:PersonName>
+                                    <cerif:FamilyNames>ANDACIC</cerif:FamilyNames>
+                                    <cerif:FirstNames>KATARINA</cerif:FirstNames>
+                                </cerif:PersonName>
+                            </cerif:Person>
+                            <cerif:Affiliation>
+                                <cerif:OrgUnit>
+                                    <cerif:Name xml:lang="en">Center of Faculty of Civil Engineering ltd, Croatia</cerif:Name>
+                                </cerif:OrgUnit>
+                            </cerif:Affiliation>
+                        </cerif:Author>
+                        <cerif:Author>
+                            <cerif:DisplayName>KENNETH GAVIN</cerif:DisplayName>
+                            <cerif:Person id="45121f5d-fd6e-4bc5-a44c-1ee3b586af6d">
+                                <cerif:PersonName>
+                                    <cerif:FamilyNames>GAVIN</cerif:FamilyNames>
+                                    <cerif:FirstNames>KENNETH</cerif:FirstNames>
+                                </cerif:PersonName>
+                            </cerif:Person>
+                            <cerif:Affiliation>
+                                <cerif:OrgUnit>
+                                    <cerif:Name xml:lang="en">TU Delft, the Netherlands</cerif:Name>
+                                </cerif:OrgUnit>
+                            </cerif:Affiliation>
+                        </cerif:Author>
+                        <cerif:Author>
+                            <cerif:DisplayName>KOSTA URUMOVIC</cerif:DisplayName>
+                            <cerif:Person id="01cbdded-70b9-4897-8f8e-70688104ba87">
+                                <cerif:PersonName>
+                                    <cerif:FamilyNames>URUMOVIC</cerif:FamilyNames>
+                                    <cerif:FirstNames>KOSTA</cerif:FirstNames>
+                                </cerif:PersonName>
+                            </cerif:Person>
+                            <cerif:Affiliation>
+                                <cerif:OrgUnit>
+                                    <cerif:Name xml:lang="en">Croatian Geological Survey, Croatia</cerif:Name>
+                                </cerif:OrgUnit>
+                            </cerif:Affiliation>
+                        </cerif:Author>
+                    </cerif:Authors>
+                    <cerif:Keyword xml:lang="en">liquefaction</cerif:Keyword>
+                    <cerif:Keyword xml:lang="en">levee</cerif:Keyword>
+                    <cerif:Keyword xml:lang="en">soil investigation works</cerif:Keyword>
+                    <cerif:Keyword xml:lang="en">remediation design</cerif:Keyword>
+                    <cerif:Keyword xml:lang="en">LeveeLiq project</cerif:Keyword>
+                    <cerif:Abstract xml:lang="en">Levees are particularly susceptible to damage during seismic events, and failure mechanisms can involve large deformations due to soil liquefaction within and below the levee. To assess the liquefaction potential below the levees, and for the purpose of planning liquefaction mitigation measures, in-situ and/or laboratory investigations must be carried out. This is a challenge, especially due to the great length of the levees, and the limited financial and time resources available for carrying out the investigations. This paper provides an insight into two examples of investigation work carried out to determine the liquefaction potential and gives an overview of the design measures to remediate the underlying soil. These are the PuScine levee in Medimurje County, which was reconstructed due to insufficient height in terms of flooding, and the Hrastelnica levee in Sisak-Moslavina County, which was damaged in the 2020 Petrinja earthquake. While numerous dynamic penetration tests were carried out on the PuScine levee to assess the liquefaction potential, Hrastelnica levee assessments relied on the static (cone) penetration tests. The paper further discusses step forward in mapping the spatial variability of liquefaction potential under the levees, through the efforts of ongoing LeveeLiq project.</cerif:Abstract>
+                    <cerif:PresentedAt>
+                        <Event>
+                            <Acronym>EUROENGEO</Acronym>
+                            <Name xml:lang="en">EUROENGEO 2024</Name>
+                            <Place>Europe</Place>
+                            <Country>Croatia</Country>
+                            <StartDate>2024-01-01</StartDate>
+                            <EndDate>2024-01-02</EndDate>
+                        </Event>
+                    </cerif:PresentedAt>
+                    <cerif:Status scheme="/dk/atira/pure/researchoutput/status">published</cerif:Status>
+                </cerif:Publication>
+            </metadata>
+        </record>
+    </ListRecords>
+</OAI-PMH>
