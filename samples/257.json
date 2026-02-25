@@ -1,14 +1,14 @@
 {
   "title": "Soil Investigations as a Cornerstone for Geotechnical Design of Liquefaction Mitigation Measures Below Levees",
   "authors": [
-    "MARIO BACIC",
-    "KATARINA ANDACIC",
-    "KENNETH GAVIN",
-    "KOSTA URUMOVIC"
+    "Mario Bacic",
+    "Katarina Andacic",
+    "Kenneth Gavin",
+    "Kosta Urumovic"
   ],
   "affiliations": [
     "University of Zagreb, Faculty of Civil Engineering, Croatia",
-    "Center of Faculty of Civil Engineering ltd, Croatia",
+    "Center of Faculty of Civil Engineering Ltd, Croatia",
     "TU Delft, the Netherlands",
     "Croatian Geological Survey, Croatia"
   ],
@@ -26,10 +26,10 @@
   "publisher": "IAEG",
   "conference_name": "EUROENGEO 2024",
   "conference_acronym": "EUROENGEO",
-  "conference_place": "Europe",
-  "conference_country": "Croatia",
+  "conference_place": null,
+  "conference_country": null,
   "conference_dates": {
-    "start_date": "2024-01-01",
-    "end_date": "2024-01-02"
+    "start_date": null,
+    "end_date": null
   }
 }
