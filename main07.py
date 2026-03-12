@@ -24,7 +24,7 @@ client = OpenAI(api_key=api_key)
 # ----------------------------
 # SETTINGS
 # ----------------------------
-PDF_DIR = Path(r"E:\XRZONE_Files\PDFExtractor\pdf-ris\samples\batches\02")
+PDF_DIR = Path(r"E:\XRZONE_Files\PDFExtractor\pdf-ris\samples\batches\03")
 OCR_DPI = 450
 TESSERACT_CONFIG = "--oem 3 --psm 12"
 POPPLER_PATH = r"E:\XRZONE_Files\PDFExtractor\pdf-ris\poppler-25.11.0\Library\bin"
@@ -82,18 +82,22 @@ def ocr_pdf(pdf_path):
 
 def gpt_extract_json(ocr_text, snippet_length=8000):
     snippet = ocr_text[:snippet_length]
+
     prompt_json = f"""
 Extract structured metadata from this research paper text.
+
 Return ONLY valid JSON with the following fields:
+
 - title
 - subtitle (optional)
-- authors (array of full names)
-- affiliations
+- authors (array of objects with:
+    - name (full name)
+    - affiliation (organization of the author))
 - year
 - abstract
 - keywords (array)
 - doi
-- publication_type: journal or conference? 
+- publication_type: journal or conference?
 - publisher
 - journal (optional)
 - conference_name (optional)
@@ -102,9 +106,28 @@ Return ONLY valid JSON with the following fields:
 - conference_country (optional)
 - conference_dates (optional; start_date, end_date)
 
+Rules for author–affiliation matching:
+
+- Detect author–affiliation markers (numbers, *, †, superscripts)
+- Use markers first if present
+- If no markers exist, match based on layout proximity
+- If layout is unclear, match based on most probable relation
+- Each author should have the most likely affiliation if available
+- Do NOT create a separate affiliations field
+- Think carefully about how authors and affiliations are connected before producing the final JSON
+
+General rules:
+
+- Return only valid JSON
+- No explanations
+- No markdown
+- No comments
+- Missing fields should be null
+
 OCR text:
 {snippet}
 """
+
     print("🤖 Extracting JSON via GPT...")
     response = client.responses.create(model="gpt-4o-mini", input=prompt_json)
     raw_output = response.output_text.strip()
@@ -165,7 +188,7 @@ def json_to_oai_pmh(metadata_list):
             ET.SubElement(pub_el, f"{{{ns_cerif}}}Abstract", attrib={"xml:lang":"en"}).text = safe_text(metadata.get("abstract"))
 
         # Keywords
-        for kw in metadata.get("keywords", []):
+        for kw in (metadata.get("keywords") or []):
             ET.SubElement(pub_el, f"{{{ns_cerif}}}Keyword", attrib={"xml:lang":"en"}).text = safe_text(kw)
 
         # DOI
@@ -177,24 +200,34 @@ def json_to_oai_pmh(metadata_list):
         # Authors + Affiliations
         authors_el = ET.SubElement(pub_el, f"{{{ns_cerif}}}Authors")
         authors = metadata.get("authors", [])
-        affiliations = metadata.get("affiliations", [])
-        for i, author in enumerate(authors):
+
+        for author in authors:
+
+            author_name = safe_text(author.get("name"))
+            affiliation = safe_text(author.get("affiliation"))
+
             author_el = ET.SubElement(authors_el, f"{{{ns_cerif}}}Author")
-            ET.SubElement(author_el, f"{{{ns_cerif}}}DisplayName").text = safe_text(author)
+            ET.SubElement(author_el, f"{{{ns_cerif}}}DisplayName").text = author_name
+
             person_el = ET.SubElement(author_el, f"{{{ns_cerif}}}Person", id=str(uuid.uuid4()))
             name_el = ET.SubElement(person_el, f"{{{ns_cerif}}}PersonName")
-            if " " in author:
-                first, last = author.split(" ", 1)
+
+            if " " in author_name:
+                first, last = author_name.split(" ", 1)
             else:
-                first, last = author, ""
+                first, last = author_name, ""
+
             ET.SubElement(name_el, f"{{{ns_cerif}}}FirstNames").text = safe_text(first)
             ET.SubElement(name_el, f"{{{ns_cerif}}}FamilyNames").text = safe_text(last)
 
-            # Affiliation (optional)
-            if i < len(affiliations):
+            if affiliation:
                 aff_el = ET.SubElement(author_el, f"{{{ns_cerif}}}Affiliation")
                 org_el = ET.SubElement(aff_el, f"{{{ns_cerif}}}OrgUnit")
-                ET.SubElement(org_el, f"{{{ns_cerif}}}Name", attrib={"xml:lang":"en"}).text = safe_text(affiliations[i])
+                ET.SubElement(
+                    org_el,
+                    f"{{{ns_cerif}}}Name",
+                    attrib={"xml:lang":"en"}
+                ).text = affiliation
 
         # Conference info
         if metadata.get("conference_name"):
