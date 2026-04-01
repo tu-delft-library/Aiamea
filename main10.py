@@ -27,7 +27,7 @@ LAST_PAGE = 2
 OCR_ENGINE = "pymupdf"
 
 # Output format toggle: "xml" or "ris"
-OUTPUT_FORMAT = "xml"
+OUTPUT_FORMAT = "ris"
 
 # Tesseract-specific settings (only used if OCR_ENGINE = "tesseract")
 OCR_DPI = 450
