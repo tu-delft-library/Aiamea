@@ -141,6 +141,38 @@ def safe_text(val):
         return json.dumps(val)
     return str(val)
 
+def as_list(val):
+    """Always return a list, whether val is None, a string, or already a list."""
+    if val is None:
+        return []
+    if isinstance(val, list):
+        return [v for v in val if v is not None]
+    return [val]
+
+def get_affiliations(author):
+    """
+    Extract affiliations from an author dict.
+    Handles both 'affiliations' and 'affiliation' key names.
+    Splits on semicolons if multiple affiliations are in one string.
+    Returns a list of affiliation strings.
+    """
+    raw = author.get("affiliations") or author.get("affiliation") or ""
+    if isinstance(raw, list):
+        # already a list — flatten and split each item on ";"
+        result = []
+        for item in raw:
+            for part in safe_text(item).split(";"):
+                part = part.strip()
+                if part:
+                    result.append(part)
+        return result
+    else:
+        # single string — split on ";"
+        return [a.strip() for a in safe_text(raw).split(";") if a.strip()]
+
+# ----------------------------
+# GPT EXTRACTION
+# ----------------------------
 def gpt_extract_json(ocr_text, snippet_length=8000):
     snippet = ocr_text[:snippet_length]
 
@@ -153,7 +185,7 @@ Return ONLY valid JSON with the following fields:
 - subtitle (optional)
 - authors (array of objects with:
     - name (full name)
-    - affiliations (organizations of the author))
+    - affiliations (string; if multiple affiliations, separate them with semicolons))
 - year
 - abstract
 - keywords (array)
@@ -174,7 +206,7 @@ Rules for author–affiliation matching:
 - If no markers exist, match based on layout proximity
 - If layout is unclear, match based on most probable relation
 - Each author should have the most likely affiliation if available
-- Do NOT create a separate affiliations field
+- Do NOT create a separate affiliations field at the top level
 - Think carefully about how authors and affiliations are connected before producing the final JSON
 
 General rules:
@@ -230,37 +262,41 @@ def json_to_oai_pmh(metadata_list):
         pub_el = ET.SubElement(metadata_el, f"{{{ns_cerif}}}Publication", id=f"Publications/{uuid.uuid4()}")
 
         # Type
-        pub_type_key = safe_text(metadata.get("publication_type")).lower()
-        pub_type_uri = COAR_TYPE_MAP.get(pub_type_key, COAR_TYPE_MAP["conference"])
-        ET.SubElement(pub_el, f"{{{ns_pubt}}}Type").text = pub_type_uri
+        for pub_type in as_list(metadata.get("publication_type")):
+            pub_type_uri = COAR_TYPE_MAP.get(safe_text(pub_type).lower(), COAR_TYPE_MAP["conference"])
+            ET.SubElement(pub_el, f"{{{ns_pubt}}}Type").text = pub_type_uri
 
-        # Language
+        # Language (static, always "en")
         ET.SubElement(pub_el, f"{{{ns_cerif}}}Language").text = "en"
 
-        # Title / Subtitle
-        ET.SubElement(pub_el, f"{{{ns_cerif}}}Title", attrib={"xml:lang": "en"}).text = safe_text(metadata.get("title"))
-        if metadata.get("subtitle"):
-            ET.SubElement(pub_el, f"{{{ns_cerif}}}Subtitle", attrib={"xml:lang": "en"}).text = safe_text(metadata.get("subtitle"))
+        # Title
+        for title in as_list(metadata.get("title")):
+            ET.SubElement(pub_el, f"{{{ns_cerif}}}Title", attrib={"xml:lang": "en"}).text = safe_text(title)
+
+        # Subtitle
+        for subtitle in as_list(metadata.get("subtitle")):
+            ET.SubElement(pub_el, f"{{{ns_cerif}}}Subtitle", attrib={"xml:lang": "en"}).text = safe_text(subtitle)
 
         # Abstract
-        if metadata.get("abstract"):
-            ET.SubElement(pub_el, f"{{{ns_cerif}}}Abstract", attrib={"xml:lang": "en"}).text = safe_text(metadata.get("abstract"))
+        for abstract in as_list(metadata.get("abstract")):
+            ET.SubElement(pub_el, f"{{{ns_cerif}}}Abstract", attrib={"xml:lang": "en"}).text = safe_text(abstract)
 
         # Keywords
-        for kw in (metadata.get("keywords") or []):
+        for kw in as_list(metadata.get("keywords")):
             ET.SubElement(pub_el, f"{{{ns_cerif}}}Keyword", attrib={"xml:lang": "en"}).text = safe_text(kw)
 
         # DOI
-        doi_raw = safe_text(metadata.get("doi"))
-        if doi_raw.startswith("https://doi.org/"):
-            doi_raw = doi_raw.replace("https://doi.org/", "")
-        ET.SubElement(pub_el, f"{{{ns_cerif}}}DOI").text = doi_raw
+        for doi in as_list(metadata.get("doi")):
+            doi_raw = safe_text(doi)
+            if doi_raw.startswith("https://doi.org/"):
+                doi_raw = doi_raw.replace("https://doi.org/", "")
+            ET.SubElement(pub_el, f"{{{ns_cerif}}}DOI").text = doi_raw
 
         # Authors + Affiliations
         authors_el = ET.SubElement(pub_el, f"{{{ns_cerif}}}Authors")
-        for author in (metadata.get("authors") or []):
+        for author in as_list(metadata.get("authors")):
             author_name = safe_text(author.get("name"))
-            affiliation = safe_text(author.get("affiliation"))
+            affiliations = get_affiliations(author)
 
             author_el = ET.SubElement(authors_el, f"{{{ns_cerif}}}Author")
             ET.SubElement(author_el, f"{{{ns_cerif}}}DisplayName").text = author_name
@@ -276,27 +312,42 @@ def json_to_oai_pmh(metadata_list):
             ET.SubElement(name_el, f"{{{ns_cerif}}}FirstNames").text = safe_text(first)
             ET.SubElement(name_el, f"{{{ns_cerif}}}FamilyNames").text = safe_text(last)
 
-            if affiliation:
+            # One Affiliation/OrgUnit per institution
+            for aff in affiliations:
                 aff_el = ET.SubElement(author_el, f"{{{ns_cerif}}}Affiliation")
                 org_el = ET.SubElement(aff_el, f"{{{ns_cerif}}}OrgUnit")
-                ET.SubElement(org_el, f"{{{ns_cerif}}}Name", attrib={"xml:lang": "en"}).text = affiliation
+                ET.SubElement(org_el, f"{{{ns_cerif}}}Name", attrib={"xml:lang": "en"}).text = aff
 
         # Conference info
-        if metadata.get("conference_name"):
+        for conf_name in as_list(metadata.get("conference_name")):
             presented_at = ET.SubElement(pub_el, f"{{{ns_cerif}}}PresentedAt")
             event = ET.SubElement(presented_at, "Event")
-            ET.SubElement(event, "Acronym").text = safe_text(metadata.get("conference_acronym"))
-            ET.SubElement(event, "Name", attrib={"xml:lang": "en"}).text = safe_text(metadata.get("conference_name"))
-            ET.SubElement(event, "Place").text = safe_text(metadata.get("conference_place"))
-            ET.SubElement(event, "Country").text = safe_text(metadata.get("conference_country"))
+            for acronym in as_list(metadata.get("conference_acronym")):
+                ET.SubElement(event, "Acronym").text = safe_text(acronym)
+            ET.SubElement(event, "Name", attrib={"xml:lang": "en"}).text = safe_text(conf_name)
+            for place in as_list(metadata.get("conference_place")):
+                ET.SubElement(event, "Place").text = safe_text(place)
+            for country in as_list(metadata.get("conference_country")):
+                ET.SubElement(event, "Country").text = safe_text(country)
             dates = metadata.get("conference_dates") or {}
-            ET.SubElement(event, "StartDate").text = safe_text(dates.get("start_date"))
-            ET.SubElement(event, "EndDate").text = safe_text(dates.get("end_date"))
+            for start in as_list(dates.get("start_date")):
+                ET.SubElement(event, "StartDate").text = safe_text(start)
+            for end in as_list(dates.get("end_date")):
+                ET.SubElement(event, "EndDate").text = safe_text(end)
+
+        # Journal (for journal-type publications)
+        for journal in as_list(metadata.get("journal")):
+            ET.SubElement(pub_el, f"{{{ns_cerif}}}PublishedIn").text = safe_text(journal)
+
+        # Publisher
+        for publisher in as_list(metadata.get("publisher")):
+            ET.SubElement(pub_el, f"{{{ns_cerif}}}Publisher").text = safe_text(publisher)
 
         # Publication year
-        ET.SubElement(pub_el, f"{{{ns_cerif}}}PublicationDate").text = safe_text(metadata.get("year"))
+        for year in as_list(metadata.get("year")):
+            ET.SubElement(pub_el, f"{{{ns_cerif}}}PublicationDate").text = safe_text(year)
 
-        # Status
+        # Status (static)
         ET.SubElement(pub_el, f"{{{ns_cerif}}}Status",
                       attrib={"scheme": "/dk/atira/pure/researchoutput/status"}).text = "published"
 
@@ -313,62 +364,55 @@ def json_to_ris(metadata_list):
         pub_type_key = safe_text(metadata.get("publication_type")).lower()
         ris_type = RIS_TYPE_MAP.get(pub_type_key, "GEN")
 
-        # Type
         lines.append(f"TY  - {ris_type}")
 
-        # Title
-        if metadata.get("title"):
-            lines.append(f"T1  - {safe_text(metadata.get('title'))}")
+        for title in as_list(metadata.get("title")):
+            lines.append(f"T1  - {safe_text(title)}")
 
-        # Authors — one AU line per author
-        for author in (metadata.get("authors") or []):
+        for author in as_list(metadata.get("authors")):
             lines.append(f"AU  - {safe_text(author.get('name'))}")
 
-        # Year
-        if metadata.get("year"):
-            lines.append(f"PY  - {safe_text(metadata.get('year'))}")
-            lines.append(f"Y1  - {safe_text(metadata.get('year'))}")
+        for year in as_list(metadata.get("year")):
+            lines.append(f"PY  - {safe_text(year)}")
+            lines.append(f"Y1  - {safe_text(year)}")
 
-        # Abstract
-        if metadata.get("abstract"):
-            lines.append(f"N2  - {safe_text(metadata.get('abstract'))}")
-            lines.append(f"AB  - {safe_text(metadata.get('abstract'))}")
+        for abstract in as_list(metadata.get("abstract")):
+            lines.append(f"N2  - {safe_text(abstract)}")
+            lines.append(f"AB  - {safe_text(abstract)}")
 
-        # Keywords — one KW line per keyword
-        for kw in (metadata.get("keywords") or []):
+        for kw in as_list(metadata.get("keywords")):
             lines.append(f"KW  - {safe_text(kw)}")
 
-        # DOI
-        doi_raw = safe_text(metadata.get("doi"))
-        if doi_raw.startswith("https://doi.org/"):
-            doi_raw = doi_raw.replace("https://doi.org/", "")
-        if doi_raw:
-            lines.append(f"U2  - {doi_raw}")
-            lines.append(f"DO  - {doi_raw}")
+        for doi in as_list(metadata.get("doi")):
+            doi_raw = safe_text(doi)
+            if doi_raw.startswith("https://doi.org/"):
+                doi_raw = doi_raw.replace("https://doi.org/", "")
+            if doi_raw:
+                lines.append(f"U2  - {doi_raw}")
+                lines.append(f"DO  - {doi_raw}")
 
-        # Publication type label
         lines.append(f"M3  - Conference contribution")
 
-        # Conference / journal info
-        if metadata.get("conference_name"):
-            lines.append(f"BT  - {safe_text(metadata.get('conference_name'))}")
-            lines.append(f"T2  - {safe_text(metadata.get('conference_name'))}")
+        conf_names = as_list(metadata.get("conference_name"))
+        if conf_names:
+            for conf_name in conf_names:
+                lines.append(f"BT  - {safe_text(conf_name)}")
+                lines.append(f"T2  - {safe_text(conf_name)}")
             dates = metadata.get("conference_dates") or {}
-            start = safe_text(dates.get("start_date"))
-            end = safe_text(dates.get("end_date"))
+            start = safe_text(as_list(dates.get("start_date"))[0]) if as_list(dates.get("start_date")) else ""
+            end = safe_text(as_list(dates.get("end_date"))[0]) if as_list(dates.get("end_date")) else ""
             if start or end:
                 lines.append(f"Y2  - {start} through {end}")
-        elif metadata.get("journal"):
-            lines.append(f"JO  - {safe_text(metadata.get('journal'))}")
-            lines.append(f"T2  - {safe_text(metadata.get('journal'))}")
+        else:
+            for journal in as_list(metadata.get("journal")):
+                lines.append(f"JO  - {safe_text(journal)}")
+                lines.append(f"T2  - {safe_text(journal)}")
 
-        # Publisher
-        if metadata.get("publisher"):
-            lines.append(f"PB  - {safe_text(metadata.get('publisher'))}")
+        for publisher in as_list(metadata.get("publisher")):
+            lines.append(f"PB  - {safe_text(publisher)}")
 
-        # End of record
         lines.append("ER  - ")
-        lines.append("")  # blank line between records
+        lines.append("")
 
     return "\n".join(lines)
 
@@ -405,7 +449,7 @@ for pdf_file in sorted(PDF_DIR.glob("*.pdf")):
             json_path.write_text(json.dumps(metadata_json, indent=2, ensure_ascii=False), encoding="utf-8")
             print(f"✅ JSON saved: {json_path.name}")
         except Exception as e:
-            print(f"⚠️ Claude failed for {pdf_file.name}: {e}")
+            print(f"⚠️ GPT failed for {pdf_file.name}: {e}")
             continue
 
     metadata_list.append(metadata_json)
