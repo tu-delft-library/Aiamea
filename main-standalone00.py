@@ -12,6 +12,10 @@ from tkinter import ttk, filedialog, messagebox
 from openai import OpenAI
 from dotenv import load_dotenv
 
+# ----------------------------
+# OPENAI CLIENT SETUP
+# ----------------------------
+
 if getattr(sys, "frozen", False):
     base_dir = Path(sys.executable).parent
 else:
@@ -30,19 +34,6 @@ if not api_key:
     raise ValueError(f"OPENAI_API_KEY not found in {env_path}")
 
 client = OpenAI(api_key=api_key)
-
-# ----------------------------
-# OPENAI CLIENT SETUP
-# ----------------------------
-# env_path = Path(__file__).resolve().parent / ".env"
-# load_dotenv(env_path)
-# api_key = os.getenv("OPENAI_API_KEY")
-
-# # load_dotenv()
-# # api_key = os.getenv("OPENAI_API_KEY")
-# if not api_key:
-#     raise ValueError("OpenAI API key not found. Check your .env file.")
-# client = OpenAI(api_key=api_key)
 
 # ----------------------------
 # CONSTANTS
