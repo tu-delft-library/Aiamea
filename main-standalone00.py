@@ -7,18 +7,42 @@ import os
 import threading
 import queue
 import tkinter as tk
+import sys
 from tkinter import ttk, filedialog, messagebox
 from openai import OpenAI
 from dotenv import load_dotenv
 
+if getattr(sys, "frozen", False):
+    base_dir = Path(sys.executable).parent
+else:
+    base_dir = Path(__file__).resolve().parent
+
+env_path = base_dir / ".env"
+
+print("Looking for .env at:", env_path)
+print("Exists:", env_path.exists())
+
+load_dotenv(env_path)
+
+api_key = os.getenv("OPENAI_API_KEY")
+
+if not api_key:
+    raise ValueError(f"OPENAI_API_KEY not found in {env_path}")
+
+client = OpenAI(api_key=api_key)
+
 # ----------------------------
 # OPENAI CLIENT SETUP
 # ----------------------------
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("OpenAI API key not found. Check your .env file.")
-client = OpenAI(api_key=api_key)
+# env_path = Path(__file__).resolve().parent / ".env"
+# load_dotenv(env_path)
+# api_key = os.getenv("OPENAI_API_KEY")
+
+# # load_dotenv()
+# # api_key = os.getenv("OPENAI_API_KEY")
+# if not api_key:
+#     raise ValueError("OpenAI API key not found. Check your .env file.")
+# client = OpenAI(api_key=api_key)
 
 # ----------------------------
 # CONSTANTS
@@ -28,7 +52,14 @@ LAST_PAGE = 2
 
 OCR_DPI = 450
 TESSERACT_CONFIG = "--oem 3 --psm 12"
-POPPLER_PATH = r"E:\XRZONE_Files\PDFExtractor\pdf-ris\poppler-25.11.0\Library\bin"
+# POPPLER_PATH = r"E:\XRZONE_Files\PDFExtractor\pdf-ris\poppler-25.11.0\Library\bin"
+# BASE_DIR = Path(__file__).resolve().parent
+
+# BASE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+# POPPLER_PATH = BASE_DIR.parent / "poppler-25.11.0" / "Library" / "bin"
+
+BASE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+POPPLER_PATH = BASE_DIR / "poppler-25.11.0" / "Library" / "bin"
 
 COAR_TYPE_MAP = {
     "journal":    "http://purl.org/coar/resource_type/c_6501",
@@ -96,7 +127,10 @@ def ocr_with_tesseract(pdf_path):
     from pdf2image import convert_from_path
     import pytesseract
     import cv2
-    import numpy as np
+    import numpy as np1
+
+    TESSERACT_PATH = BASE_DIR / "tesseract" / "tesseract.exe"
+    pytesseract.pytesseract.tesseract_cmd = str(TESSERACT_PATH)
 
     pages = convert_from_path(
         str(pdf_path), OCR_DPI,
@@ -252,6 +286,8 @@ def json_to_oai_pmh(metadata_list):
             ET.SubElement(pub_el, f"{{{ns_cerif}}}DOI").text = doi_raw
 
         authors_el = ET.SubElement(pub_el, f"{{{ns_cerif}}}Authors")
+
+        ## Note: This author–affiliation logic is a best effort based on the provided metadata structure: Check " " logic.
         for author in as_list(metadata.get("authors")):
             author_name = safe_text(author.get("name"))
             affiliations = get_affiliations(author)
