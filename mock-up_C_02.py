@@ -38,9 +38,6 @@ TESSERACT_CONFIG = "--oem 3 --psm 12"
 BASE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
 POPPLER_PATH = BASE_DIR / "poppler-25.11.0" / "Library" / "bin"
 
-print("POPPLER_PATH =", POPPLER_PATH)
-print("Exists =", os.path.exists(POPPLER_PATH))
-
 COAR_TYPE_MAP = {
     "journal":    "http://purl.org/coar/resource_type/c_6501",
     "conference": "http://purl.org/coar/resource_type/c_5794",
