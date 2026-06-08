@@ -362,7 +362,8 @@ def json_to_ris(metadata_list):
 def run_batch(settings, log_q, progress_q):
     pdf_dir       = Path(settings.pdf_dir)
     ocr_engine    = settings.ocr_engine
-    output_format = settings.output_format
+    output_ris = settings.output_ris
+    output_xml = settings.output_xml
     dpi = settings.dpi
 
     files = sorted(pdf_dir.glob("*.pdf"))
@@ -422,25 +423,25 @@ def run_batch(settings, log_q, progress_q):
         log_q.put("No metadata collected — nothing to write.")
         return
 
-    if output_format == "xml":
-        output_path = pdf_dir / f"combined_{ocr_engine}.xml"
-        log_q.put("Writing combined XML...")
-        try:
-            output_text = json_to_oai_pmh(metadata_list)
-            output_path.write_text(output_text, encoding="utf-8")
-            log_q.put(f"Done. XML saved: {output_path}")
-        except Exception as e:
-            log_q.put(f"ERROR (XML write): {e}")
-
-    elif output_format == "ris":
+    if settings.output_ris:
         output_path = pdf_dir / f"combined_{ocr_engine}.ris"
-        log_q.put("Writing combined RIS...")
+        log_q.put("Writing RIS...")
         try:
             output_text = json_to_ris(metadata_list)
             output_path.write_text(output_text, encoding="utf-8")
-            log_q.put(f"Done. RIS saved: {output_path}")
+            log_q.put(f"RIS saved: {output_path}")
         except Exception as e:
             log_q.put(f"ERROR (RIS write): {e}")
+
+    if settings.output_xml:
+        output_path = pdf_dir / f"combined_{ocr_engine}.xml"
+        log_q.put("Writing XML...")
+        try:
+            output_text = json_to_oai_pmh(metadata_list)
+            output_path.write_text(output_text, encoding="utf-8")
+            log_q.put(f"XML saved: {output_path}")
+        except Exception as e:
+            log_q.put(f"ERROR (XML write): {e}")
 
 # ----------------------------
 # SETTINGS MODEL
@@ -451,6 +452,8 @@ class Settings:
         self.ocr_engine    = 'pymupdf'
         self.output_format = 'ris'
         self.dpi           = 300
+        self.output_ris = True
+        self.output_xml = False
 
 # ----------------------------
 # GUI
@@ -487,10 +490,12 @@ class App(tk.Tk):
         self.dpi_values = [200, 300, 400, 450, 600]
         self.dpi_var = tk.IntVar(value=self.settings.dpi)
 
-        self.out_var = tk.StringVar(value='ris')
+        self.out_ris = tk.BooleanVar(value=True)
+        self.out_xml = tk.BooleanVar(value=False)
+
         ttk.Label(opts, text='Output').grid(row=0, column=1, sticky='w', padx=(30, 0))
-        ttk.Radiobutton(opts, text='RIS', variable=self.out_var, value='ris').grid(row=1, column=1, sticky='w', padx=(30, 0))
-        ttk.Radiobutton(opts, text='XML', variable=self.out_var, value='xml').grid(row=2, column=1, sticky='w', padx=(30, 0))
+        ttk.Checkbutton(opts, text='RIS', variable=self.out_ris).grid(row=1, column=1, sticky='w', padx=(30, 0))
+        ttk.Checkbutton(opts, text='XML', variable=self.out_xml).grid(row=2, column=1, sticky='w', padx=(30, 0))
 
         actions = ttk.Frame(self, padding=10)
         actions.pack(fill='x')
@@ -539,7 +544,8 @@ class App(tk.Tk):
             return
         self.settings.pdf_dir       = self.folder_var.get()
         self.settings.ocr_engine    = self.ocr_var.get()
-        self.settings.output_format = self.out_var.get()
+        self.settings.output_ris = self.out_ris.get()
+        self.settings.output_xml = self.out_xml.get()
         self.pb['value'] = 0
         self.txt.delete('1.0', 'end')
         self.run_btn.config(state='disabled')
@@ -550,6 +556,9 @@ class App(tk.Tk):
         last = self.last_page_var.get().strip()
         self.settings.last_page = int(last) if last else None
         print(f"[DEBUG] Pages: {self.settings.first_page} → {self.settings.last_page}")
+
+        self.settings.output_ris = self.out_ris.get()
+        self.settings.output_xml = self.out_xml.get()
 
         threading.Thread(
             target=self._run_and_reenable,
