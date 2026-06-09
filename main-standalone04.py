@@ -368,6 +368,18 @@ def run_batch(settings, log_q, progress_q):
 
     files = sorted(pdf_dir.glob("*.pdf"))
     total = len(files)
+
+    # --- CACHE CLEANUP ---
+    if settings.clear_cache:
+        log_q.put("Clearing cache...")
+
+        for cache_root in pdf_dir.glob("cache"):
+            if cache_root.is_dir():
+                import shutil
+                shutil.rmtree(cache_root, ignore_errors=True)
+
+        log_q.put("Cache cleared.")
+
     if not total:
         log_q.put("No PDF files found.")
         return
@@ -375,10 +387,16 @@ def run_batch(settings, log_q, progress_q):
     metadata_list = []
 
     for i, pdf_file in enumerate(files, start=1):
-        base_name      = pdf_file.stem
-        output_dir     = pdf_file.parent
-        ocr_cache_path = output_dir / f"{base_name}_total_{ocr_engine}.txt"
-        json_path      = output_dir / f"{base_name}_{ocr_engine}.json"
+        base_name = pdf_file.stem
+        output_dir = pdf_file.parent
+
+        # Cache folder
+        cache_dir = output_dir / "cache" / ocr_engine
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # Cache files
+        ocr_cache_path = cache_dir / f"{base_name}_total_{ocr_engine}.txt"
+        json_path = cache_dir / f"{base_name}_{ocr_engine}.json"
 
         # --- OCR ---
         if ocr_cache_path.exists():
@@ -453,8 +471,9 @@ class Settings:
         self.output_format = 'ris'
         self.dpi           = 300
         self.output_ris = True
-        self.output_xml = False
+        self.output_xml = True
         self.prompt_file = str(PROMPT_PATH)
+        self.clear_cache = False
 # ----------------------------
 # GUI
 # ----------------------------
@@ -491,7 +510,14 @@ class App(tk.Tk):
         self.dpi_var = tk.IntVar(value=self.settings.dpi)
 
         self.out_ris = tk.BooleanVar(value=True)
-        self.out_xml = tk.BooleanVar(value=False)
+        self.out_xml = tk.BooleanVar(value=True)
+
+        self.clear_cache_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(
+            opts,
+            text="Clear OCR Cache (.txt and .json files)",
+            variable=self.clear_cache_var
+        ).grid(row=3, column=1, sticky='w', padx=(30, 0))
 
         ttk.Label(opts, text='Output').grid(row=0, column=1, sticky='w', padx=(30, 0))
         ttk.Checkbutton(opts, text='RIS', variable=self.out_ris).grid(row=1, column=1, sticky='w', padx=(30, 0))
@@ -577,6 +603,8 @@ class App(tk.Tk):
         self.settings.output_xml = self.out_xml.get()
 
         self.settings.prompt_file = self.prompt_var.get()
+
+        self.settings.clear_cache = self.clear_cache_var.get()
 
         threading.Thread(
             target=self._run_and_reenable,
