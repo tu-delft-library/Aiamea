@@ -1,5 +1,6 @@
 # Aiamea
 
+<img width="122" height="122" alt="image" src="https://github.com/user-attachments/assets/c24ac0d1-1e1d-4234-b792-808a3f120341" />
 
 With Aiamea the TU Delft Library aims to develop an Artificial Intelligence Assisted Meta-data Extraction Application.
 
