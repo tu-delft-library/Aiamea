@@ -30,3 +30,4 @@ Aiamea is shared under a Creative Commons Attribution-NonCommercial-ShareAlike l
 
 (Tesseract is distributed under the Apache License)
 
+[Download](https://github.com/tu-delft-library/Aiamea/releases/download/Aiamea/Aiamea.v0.7.zip)
