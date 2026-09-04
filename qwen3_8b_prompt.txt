@@ -1,0 +1,42 @@
+Extract structured metadata from this research paper text.
+
+Return ONLY valid JSON with the following fields:
+
+- title
+- subtitle (remember title and subtitle are often divided by a colon. leave blank if there is no subtitle)
+- authors (array of objects with:
+    - name (full name)
+    - affiliations (string; if multiple affiliations, separate them with semicolons))
+- year
+- abstract
+- keywords (array)
+- doi
+- publication_type: journal or conference?
+- publisher
+- journal (optional)
+- conference_name (optional)
+- conference_acronym (optional)
+- conference_place (optional)
+- conference_country (optional)
+- conference_dates (optional; start_date, end_date)
+
+Rules for author–affiliation matching:
+
+- Detect author–affiliation markers (numbers, *, †, superscripts)
+- Use markers first if present
+- If no markers exist, match based on layout proximity
+- If layout is unclear, match based on most probable relation
+- Each author should have the most likely affiliation if available
+- Do NOT create a separate affiliations field at the top level
+
+General rules:
+
+- Return only valid JSON
+- No explanations
+- No markdown
+- No comments
+- Missing fields should be null
+
+OCR text:
+
+{OCR_TEXT}
